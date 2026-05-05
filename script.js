@@ -1,7 +1,7 @@
  const SUPABASE_URL = 'https://0ec90b57d6e95fcbda19832f.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const TILE_COLORS = [
             { bg: 'bg-green-100', text: 'text-green-500' },
@@ -186,7 +186,7 @@
 
         async function saveGameHistory() {
             try {
-                await supabase.from('game_history').insert({
+                await supabaseClient.from('game_history').insert({
                     step_number: gameState.moves,
                     time_taken: formatTime(gameState.timeElapsed)
                 });
@@ -198,7 +198,7 @@
 
         async function loadGameHistory() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('game_history')
                     .select('*')
                     .order('created_at', { ascending: false })
@@ -281,7 +281,7 @@
         loadGameHistory();
         updateButtonStates();
 
-        supabase
+        supabaseClient
             .channel('game_history_changes')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'game_history' }, () => {
                 loadGameHistory();
